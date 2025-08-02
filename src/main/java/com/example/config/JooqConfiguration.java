@@ -14,6 +14,8 @@ import org.jooq.impl.DefaultConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
+
 /**
  * jOOQ configuration for Quarkus CDI integration.
  * 
@@ -31,11 +33,11 @@ public class JooqConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(JooqConfiguration.class);
 
     @Inject
-    Instance<AgroalDataSource> dataSourceInstance;
+    Instance<DataSource> dataSourceInstance;
 
     /**
      * Produces a CDI-managed DSLContext bean configured for MySQL.
-     * Only created when a DataSource is available (i.e., not in test mode without DB).
+     * Works with both AgroalDataSource (production) and TestContainers DataSource (tests).
      * 
      * The DSLContext provides the entry point for all jOOQ operations
      * and integrates with Quarkus transaction management.
@@ -47,15 +49,15 @@ public class JooqConfiguration {
     @DefaultBean
     public DSLContext dslContext() {
         if (dataSourceInstance.isUnsatisfied()) {
-            LOG.warn("DataSource not available, creating jOOQ DSLContext without connection");
-            // Return a mock DSLContext for environments without database
-            Configuration configuration = new DefaultConfiguration()
-                .set(SQLDialect.MYSQL);
-            return DSL.using(configuration);
+            LOG.error("DataSource not available for jOOQ configuration. " +
+                     "Check application.properties and database configuration.");
+            throw new IllegalStateException("No DataSource available for jOOQ configuration. " +
+                "Ensure database is properly configured and datasource properties are set.");
         }
         
-        AgroalDataSource dataSource = dataSourceInstance.get();
-        LOG.info("Creating jOOQ DSLContext with MySQL dialect and DataSource");
+        DataSource dataSource = dataSourceInstance.get();
+        LOG.info("Creating jOOQ DSLContext with MySQL dialect. DataSource type: {}", 
+                dataSource.getClass().getSimpleName());
         
         Configuration configuration = new DefaultConfiguration()
             .set(dataSource)

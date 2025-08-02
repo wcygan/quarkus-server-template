@@ -143,11 +143,7 @@
             <version>3.26.3</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-jdbc-h2</artifactId>
-            <scope>test</scope>
-        </dependency>
+        <!-- H2 dependency removed - using TestContainers MySQL for all database tests -->
     </dependencies>
 
     <build>

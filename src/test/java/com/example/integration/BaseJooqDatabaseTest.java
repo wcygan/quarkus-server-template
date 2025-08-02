@@ -1,8 +1,8 @@
 package com.example.integration;
 
 import com.example.generated.jooq.Userapi;
+import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.test.junit.TestProfile;
 import jakarta.inject.Inject;
 import org.jooq.DSLContext;
 import org.jooq.Table;
@@ -54,7 +54,7 @@ import static com.example.generated.jooq.Tables.*;
  * </pre>
  */
 @QuarkusTest
-@TestProfile(MySQLTestProfile.class)
+@QuarkusTestResource(MySQLTestResource.class)
 @EnabledIfSystemProperty(named = "test.database", matches = "true")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class BaseJooqDatabaseTest {
