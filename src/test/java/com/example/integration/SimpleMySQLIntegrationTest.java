@@ -16,6 +16,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Simple integration test to verify that TestContainer MySQL setup is working.
  * This test focuses on the basic infrastructure without jOOQ complexities.
+ * 
+ * Features tested:
+ * - DataSource injection and availability
+ * - DSLContext injection and jOOQ integration
+ * - Basic database connectivity
+ * 
+ * To run: mvn test -Dtest.database=true -Dtest="SimpleMySQLIntegrationTest"
  */
 @QuarkusTest
 @QuarkusTestResource(MySQLTestResource.class)
@@ -50,5 +57,31 @@ class SimpleMySQLIntegrationTest {
         Integer result = dslContext.selectOne().fetchOne(0, Integer.class);
         assertThat(result).isEqualTo(1);
         LOG.info("Database connectivity verified: SELECT 1 returned {}", result);
+    }
+
+    @Test
+    void testFlywayMigrationExecuted() {
+        LOG.info("Testing that Flyway migrations executed successfully");
+        
+        // Verify the users table exists by counting rows (should return 0 for empty table)
+        Integer count = dslContext
+                .selectCount()
+                .from("users")
+                .fetchOne(0, Integer.class);
+        
+        assertThat(count).isNotNull();
+        assertThat(count).isGreaterThanOrEqualTo(0);
+        
+        LOG.info("Verified users table exists and can be queried, current count: {}", count);
+    }
+
+    @Test
+    void testDatabaseDialect() {
+        LOG.info("Testing that jOOQ is using correct MySQL dialect");
+        
+        String dialect = dslContext.configuration().dialect().name();
+        assertThat(dialect).isEqualTo("MYSQL");
+        
+        LOG.info("Verified jOOQ is using MySQL dialect: {}", dialect);
     }
 }
