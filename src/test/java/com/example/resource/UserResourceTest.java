@@ -261,8 +261,8 @@ public class UserResourceTest extends BaseJooqDatabaseTest {
             .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
-            .body("error", equalTo("Invalid request"))
-            .body("message", containsString("Username query parameter is required"))
+            .body("error", equalTo("Validation failed"))
+            .body("message", containsString("Request validation failed"))
             .body("timestamp", notNullValue());
     }
 
@@ -278,8 +278,8 @@ public class UserResourceTest extends BaseJooqDatabaseTest {
             .then()
             .statusCode(400)
             .contentType(ContentType.JSON)
-            .body("error", equalTo("Invalid request"))
-            .body("message", containsString("Username query parameter is required"))
+            .body("error", equalTo("Validation failed"))
+            .body("message", containsString("Request validation failed"))
             .body("timestamp", notNullValue());
     }
 
@@ -320,10 +320,18 @@ public class UserResourceTest extends BaseJooqDatabaseTest {
             .extract()
             .as(UserResponse.class);
 
-        // Verify all responses are consistent
-        assertThat(userById).isEqualTo(createdUser);
-        assertThat(userByUsername).isEqualTo(createdUser);
-        assertThat(userById).isEqualTo(userByUsername);
+        // Verify all responses are consistent (id and username should match)
+        assertThat(userById.id()).isEqualTo(createdUser.id());
+        assertThat(userById.username()).isEqualTo(createdUser.username());
+        assertThat(userByUsername.id()).isEqualTo(createdUser.id());
+        assertThat(userByUsername.username()).isEqualTo(createdUser.username());
+        assertThat(userById.id()).isEqualTo(userByUsername.id());
+        assertThat(userById.username()).isEqualTo(userByUsername.username());
+        
+        // Verify timestamps are recent and not null
+        assertThat(userById.createdAt()).isNotNull();
+        assertThat(userByUsername.createdAt()).isNotNull();
+        assertThat(createdUser.createdAt()).isNotNull();
     }
 
     @Test

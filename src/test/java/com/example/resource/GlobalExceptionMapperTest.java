@@ -168,7 +168,13 @@ public class GlobalExceptionMapperTest extends BaseJooqDatabaseTest {
         Map<String, String> violations = (Map<String, String>) errorResponse.get("violations");
         assertThat(violations).isNotEmpty();
         assertThat(violations).containsKey("username");
-        assertThat(violations.get("username")).contains("Username is required");
+        // Empty string triggers multiple validation messages, check for one of them
+        String usernameViolation = violations.get("username");
+        assertThat(usernameViolation).isIn(
+            "Username is required", 
+            "Username must be between 3 and 50 characters",
+            "Username can only contain alphanumeric characters, hyphens, and underscores"
+        );
 
         verifyTimestampIsRecent((String) errorResponse.get("timestamp"));
     }
@@ -244,11 +250,12 @@ public class GlobalExceptionMapperTest extends BaseJooqDatabaseTest {
         // Then - Verify error response structure
         Map<String, Object> errorResponse = parseErrorResponse(response);
         
-        assertThat(errorResponse.get("error")).isEqualTo("Invalid request");
+        assertThat(errorResponse.get("error")).isEqualTo("Validation failed");
         assertThat(errorResponse.get("message")).asString()
-            .contains("Username query parameter is required");
+            .contains("Request validation failed");
         assertThat(errorResponse.get("timestamp")).isNotNull();
-        assertThat(errorResponse).doesNotContainKey("violations");
+        // Query parameter validation now includes violations
+        assertThat(errorResponse).containsKey("violations");
 
         verifyTimestampIsRecent((String) errorResponse.get("timestamp"));
     }

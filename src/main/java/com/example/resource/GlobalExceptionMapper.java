@@ -168,14 +168,21 @@ public class GlobalExceptionMapper {
     public Response mapWebApplicationException(WebApplicationException exception) {
         Log.debug("Web application exception: " + exception.getMessage());
         
-        String errorType = getErrorTypeFromStatus(exception.getResponse().getStatus());
+        int status = exception.getResponse().getStatus();
+        String errorType = getErrorTypeFromStatus(status);
         String message = exception.getMessage() != null ? 
             exception.getMessage() : 
             "Request could not be processed";
         
+        // Handle specific cases for consistent error messages
+        if (exception instanceof BadRequestException) {
+            // Keep the original message for BadRequestException
+            message = exception.getMessage() != null ? exception.getMessage() : "Invalid request";
+        }
+        
         Map<String, Object> errorResponse = createErrorResponse(errorType, message);
         
-        return Response.status(exception.getResponse().getStatus())
+        return Response.status(status)
             .entity(errorResponse)
             .build();
     }

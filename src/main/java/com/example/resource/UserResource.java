@@ -110,14 +110,25 @@ public class UserResource {
      */
     @GET
     @Path("/{id}")
-    public UserResponse getUserById(@PathParam("id") UUID id) {
+    public UserResponse getUserById(@PathParam("id") String id) {
         LOG.debug("Received request to get user by ID: {}", id);
         
         try {
-            UserResponse userResponse = userService.getUserById(id);
-            LOG.debug("Successfully retrieved user with ID: {}", id);
+            // Parse UUID and handle invalid format
+            UUID uuid;
+            try {
+                uuid = UUID.fromString(id);
+            } catch (IllegalArgumentException e) {
+                LOG.warn("Received request with invalid UUID format: {}", id);
+                throw new BadRequestException("Invalid UUID format: " + id);
+            }
+            
+            UserResponse userResponse = userService.getUserById(uuid);
+            LOG.debug("Successfully retrieved user with ID: {}", uuid);
             return userResponse;
             
+        } catch (BadRequestException e) {
+            throw e; // Re-throw BadRequestException
         } catch (Exception e) {
             LOG.debug("Failed to retrieve user with ID: {}", id, e);
             throw e; // Let global exception mapper handle it
@@ -145,12 +156,6 @@ public class UserResource {
         String username) {
         
         LOG.debug("Received request to get user by username: {}", username);
-        
-        // Additional validation for query parameter
-        if (username == null || username.isBlank()) {
-            LOG.warn("Received request with missing or blank username parameter");
-            throw new BadRequestException("Username query parameter is required and cannot be blank");
-        }
         
         try {
             UserResponse userResponse = userService.getUserByUsername(username);
