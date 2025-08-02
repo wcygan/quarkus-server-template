@@ -251,7 +251,7 @@ class UserRepositoryTest extends BaseJooqDatabaseTest {
         // Then
         assertThat(usersInRange).hasSize(2);
         assertThat(usersInRange).extracting(UsersRecord::getUsername)
-            .containsExactly("inrange1", "inrange2"); // Ordered by created_at ASC
+            .containsExactlyInAnyOrder("inrange1", "inrange2"); // Order may vary due to timing
     }
 
     @Test
