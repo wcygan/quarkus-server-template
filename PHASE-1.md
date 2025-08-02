@@ -14,9 +14,44 @@ Phase 1 focuses on creating the essential building blocks that all subsequent de
 - **Next Phase**: [PHASE-2.md](./PHASE-2.md) (Core Implementation)
 - **Estimated Duration**: 1-2 days
 
+## Specialized Agent Usage for Phase 1
+
+**Critical: Use these specialized agents throughout Phase 1 for optimal efficiency and expertise:**
+
+### quarkus-specialist Agent
+**Use for all Quarkus framework setup tasks:**
+- Maven project initialization with proper Quarkus BOM and extensions
+- Quarkus-specific configuration in application.properties
+- Development mode setup and troubleshooting
+- Extension configuration (REST, Jackson, MySQL, Flyway, Health)
+- Dev Services configuration for local development
+
+### mysql-database-architect Agent  
+**Use for all database architecture tasks:**
+- Database schema design with proper constraints and indexing
+- MySQL-specific configuration and optimization
+- Flyway migration script creation and validation
+- Connection pooling configuration
+- Performance considerations for table design
+
+### jooq-specialist Agent
+**Use for all jOOQ integration tasks:**
+- jOOQ Maven plugin configuration
+- Code generation pipeline setup
+- Database-to-Java type mapping configuration
+- Integration with Maven build lifecycle
+- Generated class validation and testing
+
+**Agent Coordination Strategy:**
+1. Start with **quarkus-specialist** for project foundation
+2. Use **mysql-database-architect** for schema design
+3. Deploy **jooq-specialist** for code generation setup
+4. Return to **quarkus-specialist** for final integration testing
+
 ## Task Breakdown
 
 ### Task 1.1: Maven Project Initialization
+**🤖 Primary Agent: quarkus-specialist**
 
 **Objective**: Set up Quarkus project with all required extensions and proper Maven configuration.
 
@@ -71,6 +106,7 @@ Phase 1 focuses on creating the essential building blocks that all subsequent de
 - ✅ Health check endpoint accessible at `/q/health`
 
 ### Task 1.2: Database Schema Design
+**🤖 Primary Agent: mysql-database-architect**
 
 **Objective**: Create the foundational database schema using Flyway migrations with proper constraints and indexing.
 
@@ -117,6 +153,7 @@ quarkus.flyway.baseline-on-migrate=true
 - ✅ UUID values can be inserted and queried correctly
 
 ### Task 1.3: jOOQ Code Generation Pipeline
+**🤖 Primary Agent: jooq-specialist**
 
 **Objective**: Establish automated jOOQ code generation from the database schema to ensure type-safe database access.
 
@@ -181,6 +218,7 @@ quarkus.flyway.baseline-on-migrate=true
 - ✅ Type-safe queries can be written against Users table
 
 ### Task 1.4: Development Environment Setup
+**🤖 Primary Agent: quarkus-specialist** (with mysql-database-architect for database config)
 
 **Objective**: Configure local development environment with database services and proper tooling.
 

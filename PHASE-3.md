@@ -23,9 +23,49 @@ Phase 3 focuses on production readiness by implementing comprehensive testing st
 - [ ] **Deployment**: Kubernetes manifests and CI/CD pipeline configuration
 - [ ] **Documentation**: API documentation and operational runbooks
 
+## Specialized Agent Usage for Phase 3
+
+**Critical: Deploy specialized agents strategically for production readiness:**
+
+### quarkus-specialist Agent
+**Use for all Quarkus production optimization:**
+- Native compilation configuration and troubleshooting
+- Environment-specific configuration profiles
+- Performance tuning for JVM and native modes
+- Security configuration and hardening
+- Testing strategies with QuarkusTest framework
+- CI/CD pipeline integration with Quarkus-specific concerns
+- Kubernetes deployment optimization
+
+### jooq-specialist Agent
+**Use for data layer production readiness:**
+- Query performance optimization and analysis
+- Connection pool tuning for production loads
+- jOOQ configuration optimization for different environments
+- Database performance testing and monitoring
+- Advanced jOOQ features for production (batch operations, custom types)
+
+### mysql-database-architect Agent
+**Use for database production optimization:**
+- Production database configuration and tuning
+- Advanced indexing strategies and query optimization
+- Database monitoring and observability setup
+- Backup and recovery strategy implementation
+- High availability and scaling considerations
+- Performance benchmarking and load testing
+
+**Multi-Agent Coordination Strategy:**
+1. **Testing**: **quarkus-specialist** for framework testing + **jooq-specialist** for data layer tests
+2. **Configuration**: **quarkus-specialist** for app config + **mysql-database-architect** for DB config
+3. **Containerization**: **quarkus-specialist** for native compilation optimization
+4. **Observability**: **quarkus-specialist** for metrics + **mysql-database-architect** for DB monitoring
+5. **Deployment**: **quarkus-specialist** for Kubernetes optimization
+6. **Performance**: All three agents working in parallel for comprehensive optimization
+
 ## Task Breakdown
 
 ### Task 3.1: Comprehensive Testing Strategy
+**🤖 Primary Agent: quarkus-specialist** (with jooq-specialist for repository tests)
 
 **Objective**: Implement multi-tier testing strategy covering unit tests, integration tests, and native compilation validation.
 
@@ -204,6 +244,7 @@ class NativeUserResourceIT extends UserApiIntegrationTest {
 - ✅ Parallel test execution works correctly
 
 ### Task 3.2: Environment Configuration Management
+**🤖 Primary Agent: quarkus-specialist** (with mysql-database-architect for DB config)
 
 **Objective**: Configure environment-specific settings with proper secrets management and externalized configuration.
 
@@ -329,6 +370,7 @@ data:
 - ✅ Environment variables override properties correctly
 
 ### Task 3.3: Container Optimization
+**🤖 Primary Agent: quarkus-specialist**
 
 **Objective**: Create optimized Docker images for both JVM and native compilation modes with security and performance best practices.
 
@@ -481,6 +523,7 @@ volumes:
 - ✅ Multi-platform support (AMD64/ARM64)
 
 ### Task 3.4: Observability Implementation
+**🤖 Primary Agent: quarkus-specialist** (with mysql-database-architect for DB metrics)
 
 **Objective**: Implement comprehensive observability with metrics, structured logging, and distributed tracing.
 
@@ -599,6 +642,7 @@ public class UserService {
 - ✅ Performance metrics capture 95th percentile response times
 
 ### Task 3.5: Kubernetes Deployment
+**🤖 Primary Agent: quarkus-specialist**
 
 **Objective**: Create production-ready Kubernetes manifests with proper resource management, scaling, and monitoring.
 
@@ -797,6 +841,7 @@ spec:
 - ✅ Secrets and ConfigMaps work properly
 
 ### Task 3.6: CI/CD Pipeline
+**🤖 Primary Agent: quarkus-specialist**
 
 **Objective**: Implement automated CI/CD pipeline with testing, security scanning, and deployment automation.
 

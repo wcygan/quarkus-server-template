@@ -29,9 +29,47 @@ Phase 2 builds upon the foundation established in Phase 1 to create the complete
 └─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
+## Specialized Agent Usage for Phase 2
+
+**Critical: Leverage specialized agents for expert implementation throughout Phase 2:**
+
+### quarkus-specialist Agent
+**Use for all Quarkus framework implementation:**
+- REST endpoint implementation with RESTEasy Reactive
+- CDI dependency injection setup and scoping
+- Bean validation configuration and custom validators
+- Exception mapper implementation and HTTP status handling
+- Health check implementation with Quarkus MicroProfile Health
+- Transaction boundary configuration and management
+
+### jooq-specialist Agent
+**Use for all data access layer implementation:**
+- Repository pattern implementation with jOOQ DSL
+- Type-safe query construction and optimization
+- Complex query handling (joins, subqueries, filtering)
+- Pagination and sorting implementation
+- Custom data type converters and mappings
+- Transaction integration with Quarkus
+
+### mysql-database-architect Agent
+**Use for database optimization and integration:**
+- Query performance analysis and optimization
+- Index strategy validation and refinement
+- Connection pool configuration and tuning
+- Database constraint validation
+- Migration script optimization
+
+**Parallel Agent Deployment Strategy:**
+1. **Domain Models**: Use **quarkus-specialist** for validation and JSON serialization
+2. **Repository Layer**: Deploy **jooq-specialist** for type-safe data access
+3. **Service Layer**: Use **quarkus-specialist** for business logic and transaction management
+4. **REST Layer**: Use **quarkus-specialist** for endpoint implementation and error handling
+5. **Integration**: Coordinate all agents for end-to-end testing and optimization
+
 ## Task Breakdown
 
 ### Task 2.1: Domain Model Implementation
+**🤖 Primary Agent: quarkus-specialist**
 
 **Objective**: Create immutable domain models using Java records with proper validation and serialization.
 
@@ -105,6 +143,7 @@ public record UserResponse(
 - ✅ Validation errors produce proper error messages
 
 ### Task 2.2: Repository Layer Implementation
+**🤖 Primary Agent: jooq-specialist** (with mysql-database-architect for optimization)
 
 **Objective**: Implement type-safe data access using jOOQ with proper error handling and transaction management.
 
@@ -221,6 +260,7 @@ quarkus.transaction-manager.default-transaction-timeout=30s
 - ✅ Proper exception mapping from database errors
 
 ### Task 2.3: Service Layer Implementation
+**🤖 Primary Agent: quarkus-specialist**
 
 **Objective**: Implement business logic layer with validation, exception handling, and transactional operations.
 
@@ -296,6 +336,7 @@ public class UserService {
 - ✅ Business exceptions include meaningful messages
 
 ### Task 2.4: REST API Implementation
+**🤖 Primary Agent: quarkus-specialist**
 
 **Objective**: Create RESTful endpoints with proper HTTP semantics, validation, and error handling.
 
@@ -408,6 +449,7 @@ public class GlobalExceptionMapper {
 - ✅ Duplicate username returns 409 conflict
 
 ### Task 2.5: Health Check Implementation
+**🤖 Primary Agent: quarkus-specialist** (with jooq-specialist for database health checks)
 
 **Objective**: Implement custom health checks for database connectivity and application status.
 

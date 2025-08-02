@@ -126,6 +126,66 @@ Each phase has detailed task breakdowns, success criteria, and dependencies clea
 - **quarkus-recommended-tech-stack.md**: Technology choices and rationales
 - **PHASE-*.md**: Detailed phase-by-phase implementation guides
 
+## Specialized Agent Usage
+
+This project has specialized agents that should be used frequently for relevant tasks:
+
+### quarkus-specialist Agent
+**Use for all Quarkus-related tasks:**
+- Project setup and configuration
+- REST endpoint implementation with RESTEasy Reactive
+- CDI and dependency injection patterns
+- Configuration profiles and MicroProfile Config
+- Native compilation troubleshooting
+- Health checks and observability setup
+- Testing with QuarkusTest framework
+- Performance optimization and tuning
+
+**Examples:**
+- "Configure Quarkus application.properties for multiple environments"
+- "Implement REST endpoints following Quarkus best practices"
+- "Debug native compilation reflection errors"
+- "Set up health checks and metrics"
+
+### jooq-specialist Agent
+**Use for all jOOQ database operations:**
+- Repository layer implementation
+- Type-safe query construction with jOOQ DSL
+- Complex JOIN operations and subqueries
+- Pagination and filtering patterns
+- Code generation configuration
+- Transaction management
+- Performance optimization
+- Converting raw SQL to jOOQ DSL
+
+**Examples:**
+- "Create UserRepository with jOOQ for CRUD operations"
+- "Implement complex search queries with dynamic filtering"
+- "Configure jOOQ code generation from Flyway migrations"
+- "Optimize jOOQ queries for better performance"
+
+### mysql-database-architect Agent
+**Use for all database design and optimization:**
+- Schema design and table relationships
+- Index optimization and query performance
+- Flyway migration scripts
+- Database configuration for different environments
+- Connection pooling setup
+- Query performance analysis
+- Data modeling best practices
+
+**Examples:**
+- "Design MySQL schema for user management with proper indexes"
+- "Analyze slow query performance and optimize"
+- "Create Flyway migration for new features"
+- "Configure MySQL for Quarkus with proper connection pooling"
+
+**Agent Selection Guidelines:**
+- Use **quarkus-specialist** for framework-level concerns
+- Use **jooq-specialist** for repository and query implementation
+- Use **mysql-database-architect** for schema design and database optimization
+- Combine agents when tasks span multiple domains (e.g., Quarkus + jOOQ integration)
+
 ## Success Criteria for Implementation
 
 - Sub-second native startup times
