@@ -30,7 +30,7 @@ public record UserResponse(
     String username,
     
     @JsonProperty("createdAt")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     Instant createdAt
 ) {
     /**
