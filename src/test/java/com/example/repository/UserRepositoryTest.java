@@ -3,6 +3,7 @@ package com.example.repository;
 import com.example.generated.jooq.tables.records.UsersRecord;
 import com.example.integration.BaseJooqDatabaseTest;
 import com.example.repository.UserRepository.DuplicateUsernameException;
+import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,7 @@ import static org.assertj.core.api.Assertions.*;
  * - jOOQ code generation completed: mvn generate-sources
  * - Run with: mvn test -Dtest.database=true
  */
+@QuarkusTest
 class UserRepositoryTest extends BaseJooqDatabaseTest {
 
     @Inject
