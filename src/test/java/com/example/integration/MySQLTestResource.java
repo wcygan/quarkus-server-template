@@ -25,13 +25,12 @@ public class MySQLTestResource implements QuarkusTestResourceLifecycleManager {
         
         // Create and start MySQL container
         mysql = new MySQLContainer<>(DockerImageName.parse("mysql:8.0"))
-                .withDatabaseName("testdb")
-                .withUsername("testuser")  
-                .withPassword("testpass")
+                .withDatabaseName("userapi")  // Match the jOOQ generated schema name
+                .withUsername("userapi")      // Match production setup  
+                .withPassword("userapi")      // Simple password for tests
                 .withCommand("--character-set-server=utf8mb4",
                            "--collation-server=utf8mb4_unicode_ci",
-                           "--skip-character-set-client-handshake")
-                .withInitScript("test-init.sql");
+                           "--skip-character-set-client-handshake");
 
         mysql.start();
         

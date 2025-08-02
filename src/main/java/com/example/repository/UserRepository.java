@@ -53,15 +53,24 @@ public class UserRepository {
         try {
             String userId = UUID.randomUUID().toString();
             
-            UsersRecord record = dsl.insertInto(USERS)
+            // Insert the record
+            int insertedRows = dsl.insertInto(USERS)
                 .set(USERS.ID, userId)
                 .set(USERS.USERNAME, username)
                 .set(USERS.CREATED_AT, LocalDateTime.now())
-                .returning()
+                .execute();
+            
+            if (insertedRows == 0) {
+                throw new DataAccessException("Failed to create user - no rows inserted");
+            }
+            
+            // Fetch the created record
+            UsersRecord record = dsl.selectFrom(USERS)
+                .where(USERS.ID.eq(userId))
                 .fetchOne();
             
             if (record == null) {
-                throw new DataAccessException("Failed to create user - no record returned");
+                throw new DataAccessException("Failed to create user - inserted record not found");
             }
             
             LOG.info("Created user: id={}, username={}", record.getId(), record.getUsername());

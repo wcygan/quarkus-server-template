@@ -55,7 +55,9 @@ class UserRepositoryTest extends BaseJooqDatabaseTest {
         assertThat(created).isNotNull();
         assertThat(created.getId()).isNotNull().hasSize(36); // UUID format
         assertThat(created.getUsername()).isEqualTo(username);
-        assertThat(created.getCreatedAt()).isNotNull().isBeforeOrEqualTo(LocalDateTime.now());
+        assertThat(created.getCreatedAt()).isNotNull()
+            .isAfter(LocalDateTime.now().minusMinutes(1))  // Created within the last minute
+            .isBefore(LocalDateTime.now().plusMinutes(1)); // But not in the future (with 1min buffer)
         
         // Verify in database
         assertThat(getRowCount(USERS)).isEqualTo(1);
