@@ -1,5 +1,8 @@
 package com.example.repository;
 
+import com.example.domain.DuplicateUsernameException;
+import com.example.domain.DatabaseException;
+import com.example.domain.User;
 import com.example.generated.jooq.tables.records.UsersRecord;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -8,7 +11,9 @@ import org.jooq.exception.DataAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,38 +48,32 @@ public class UserRepository {
      * Creates a new user with server-generated UUID.
      * 
      * @param username the unique username
-     * @return the created user record
+     * @return the created user domain object
      * @throws DuplicateUsernameException if username already exists
-     * @throws DataAccessException if database operation fails
+     * @throws DatabaseException if database operation fails
      */
-    public UsersRecord createUser(String username) {
+    public User createUser(String username) {
         LOG.debug("Creating user with username: {}", username);
         
         try {
-            String userId = UUID.randomUUID().toString();
+            UUID userId = UUID.randomUUID();
+            Instant now = Instant.now();
+            LocalDateTime createdAt = LocalDateTime.ofInstant(now, ZoneOffset.UTC);
             
             // Insert the record
             int insertedRows = dsl.insertInto(USERS)
-                .set(USERS.ID, userId)
+                .set(USERS.ID, userId.toString())
                 .set(USERS.USERNAME, username)
-                .set(USERS.CREATED_AT, LocalDateTime.now())
+                .set(USERS.CREATED_AT, createdAt)
                 .execute();
             
             if (insertedRows == 0) {
-                throw new DataAccessException("Failed to create user - no rows inserted");
+                throw new DatabaseException("Failed to create user - no rows inserted");
             }
             
-            // Fetch the created record
-            UsersRecord record = dsl.selectFrom(USERS)
-                .where(USERS.ID.eq(userId))
-                .fetchOne();
-            
-            if (record == null) {
-                throw new DataAccessException("Failed to create user - inserted record not found");
-            }
-            
-            LOG.info("Created user: id={}, username={}", record.getId(), record.getUsername());
-            return record;
+            User user = new User(userId, username, now);
+            LOG.info("Created user: id={}, username={}", user.id(), user.username());
+            return user;
             
         } catch (org.jooq.exception.DataAccessException e) {
             if (isDuplicateKeyError(e)) {
@@ -82,7 +81,7 @@ public class UserRepository {
                 throw new DuplicateUsernameException("Username '" + username + "' already exists");
             }
             LOG.error("Failed to create user: {}", e.getMessage(), e);
-            throw e;
+            throw new DatabaseException("Failed to create user", e);
         }
     }
 
@@ -92,19 +91,19 @@ public class UserRepository {
      * @param userId the user ID
      * @return Optional containing the user if found
      */
-    public Optional<UsersRecord> findById(String userId) {
+    public Optional<User> findById(UUID userId) {
         LOG.debug("Finding user by ID: {}", userId);
         
         try {
             UsersRecord record = dsl.selectFrom(USERS)
-                .where(USERS.ID.eq(userId))
+                .where(USERS.ID.eq(userId.toString()))
                 .fetchOne();
             
-            return Optional.ofNullable(record);
+            return Optional.ofNullable(record).map(this::mapToUser);
             
         } catch (DataAccessException e) {
             LOG.error("Failed to find user by ID {}: {}", userId, e.getMessage(), e);
-            throw e;
+            throw new DatabaseException("Failed to find user by ID", e);
         }
     }
 
@@ -114,7 +113,7 @@ public class UserRepository {
      * @param username the username
      * @return Optional containing the user if found
      */
-    public Optional<UsersRecord> findByUsername(String username) {
+    public Optional<User> findByUsername(String username) {
         LOG.debug("Finding user by username: {}", username);
         
         try {
@@ -122,11 +121,11 @@ public class UserRepository {
                 .where(USERS.USERNAME.eq(username))
                 .fetchOne();
             
-            return Optional.ofNullable(record);
+            return Optional.ofNullable(record).map(this::mapToUser);
             
         } catch (DataAccessException e) {
             LOG.error("Failed to find user by username {}: {}", username, e.getMessage(), e);
-            throw e;
+            throw new DatabaseException("Failed to find user by username", e);
         }
     }
 
@@ -149,7 +148,7 @@ public class UserRepository {
             
         } catch (DataAccessException e) {
             LOG.error("Failed to find all users: {}", e.getMessage(), e);
-            throw e;
+            throw new DatabaseException("Failed to find all users", e);
         }
     }
 
@@ -168,7 +167,7 @@ public class UserRepository {
             
         } catch (DataAccessException e) {
             LOG.error("Failed to count users: {}", e.getMessage(), e);
-            throw e;
+            throw new DatabaseException("Failed to count users", e);
         }
     }
 
@@ -204,7 +203,7 @@ public class UserRepository {
                 throw new DuplicateUsernameException("Username '" + newUsername + "' already exists");
             }
             LOG.error("Failed to update user {}: {}", userId, e.getMessage(), e);
-            throw e;
+            throw new DatabaseException("Failed to update user", e);
         }
     }
 
@@ -233,7 +232,7 @@ public class UserRepository {
             
         } catch (DataAccessException e) {
             LOG.error("Failed to delete user {}: {}", userId, e.getMessage(), e);
-            throw e;
+            throw new DatabaseException("Failed to delete user", e);
         }
     }
 
@@ -255,7 +254,7 @@ public class UserRepository {
             
         } catch (DataAccessException e) {
             LOG.error("Failed to check username existence {}: {}", username, e.getMessage(), e);
-            throw e;
+            throw new DatabaseException("Failed to check username existence", e);
         }
     }
 
@@ -278,7 +277,7 @@ public class UserRepository {
             
         } catch (DataAccessException e) {
             LOG.error("Failed to find users by date range: {}", e.getMessage(), e);
-            throw e;
+            throw new DatabaseException("Failed to find users by date range", e);
         }
     }
 
@@ -294,11 +293,16 @@ public class UserRepository {
     }
 
     /**
-     * Custom exception for duplicate username attempts.
+     * Maps a jOOQ UsersRecord to a User domain object.
+     * 
+     * @param record the database record
+     * @return the domain object
      */
-    public static class DuplicateUsernameException extends RuntimeException {
-        public DuplicateUsernameException(String message) {
-            super(message);
-        }
+    private User mapToUser(UsersRecord record) {
+        return new User(
+            UUID.fromString(record.getId()),
+            record.getUsername(),
+            record.getCreatedAt().toInstant(ZoneOffset.UTC)
+        );
     }
 }
